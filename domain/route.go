@@ -5,6 +5,9 @@ import "net/http"
 // RouteHandlerVersion type
 type RouteHandlerVersion string
 
+// Handler func
+type HandlerFunc func(http.ResponseWriter, *http.Request)
+
 // RouteHandlers is a map of route version to its handler
 type RouteHandlers map[RouteHandlerVersion]http.HandlerFunc
 
@@ -14,6 +17,7 @@ type Route struct {
 	Pattern        string
 	DefaultVersion RouteHandlerVersion
 	RouteHandlers  RouteHandlers
+	Handler        HandlerFunc
 }
 
 // the routes type

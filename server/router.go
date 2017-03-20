@@ -6,6 +6,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/jorjuela33/quality-api/domain"
+	"github.com/jorjuela33/quality-api/resources"
 )
 
 type Router struct {
@@ -15,6 +16,18 @@ type Router struct {
 func NewRouter() *Router {
 	router := mux.NewRouter().StrictSlash(true)
 	return &Router{router}
+}
+
+func (router *Router) AddResources(resources ...*resource.Resource) *Router {
+	for _, resource := range resources {
+		if resource.Routes == nil {
+			panic(errors.New(fmt.Sprintf("Routes definition missing: %v", resource)))
+		}
+
+		router.AddRoutes(resource.Routes)
+	}
+
+	return router
 }
 
 func (router *Router) AddRoutes(routes *domain.Routes) *Router {
@@ -29,7 +42,7 @@ func (router *Router) AddRoutes(routes *domain.Routes) *Router {
 			panic(errors)
 		}
 
-		router.Methods(route.Method).Path(route.Pattern).Name(route.Name)
+		router.Methods(route.Method).Path(route.Pattern).Name(route.Name).HandlerFunc(route.Handler)
 	}
 
 	return router

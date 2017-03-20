@@ -46,7 +46,7 @@ func (server *Server) Run(address string, options Options) *Server {
 	return server
 }
 
-func (server *Server) UserRouter(router *Router) *Server {
+func (server *Server) UseRouter(router *Router) *Server {
 	server.negroni.UseHandler(context.ClearHandler(router))
 	return server
 }
