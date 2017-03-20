@@ -23,7 +23,7 @@ func (router *Router) AddRoutes(routes *domain.Routes) *Router {
 	}
 
 	for _, route := range *routes {
-		defaultHandler, ok := route.RouteHandlers[route.DefaultVersion]
+		_, ok := route.RouteHandlers[route.DefaultVersion]
 		if !ok {
 			errors := errors.New(fmt.Sprintf("Routes definition error, missing default route handler for version `%v` in `%v`", route.DefaultVersion, route.Name))
 			panic(errors)

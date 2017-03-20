@@ -1,21 +1,20 @@
 package main
 
 import (
-	"log"
-	"net/http"
-	"os"
-
-	"github.com/jorjuela33/quality-api/router"
+	"time"
 
 	_ "github.com/jinzhu/gorm/dialects/mssql"
+	"github.com/jorjuela33/quality-api/server"
 )
 
 func main() {
-	router := router.NewRouter()
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8000"
-	}
+	router := server.NewRouter()
+	_server := server.NewServer()
 
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	/// the router to use by the server
+	_server.UserRouter(router)
+
+	_server.Run(":8080", server.Options{
+		Timeout: 10 * time.Second,
+	})
 }
