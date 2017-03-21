@@ -1,5 +1,7 @@
 package database
 
+import "github.com/jinzhu/gorm"
+
 type Options struct {
 	ServerName   string
 	DatabaseName string
@@ -7,5 +9,6 @@ type Options struct {
 
 // Database interface
 type DatabaseInterface interface {
-	NewSession(database *DatabaseInterface) *DatabaseInterface
+	Foo()
+	DB() *gorm.DB
 }

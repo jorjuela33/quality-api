@@ -7,8 +7,12 @@ import (
 
 // MSSQLDB
 type MSSQLDB struct {
-	GormDB  *gorm.DB
+	gormDB  *gorm.DB
 	options *database.Options
+}
+
+func (database *MSSQLDB) DB() *gorm.DB {
+	return database.gormDB
 }
 
 func (database *MSSQLDB) NewSession() *MSSQLDB {
@@ -17,7 +21,7 @@ func (database *MSSQLDB) NewSession() *MSSQLDB {
 	if err != nil {
 		panic(err)
 	}
-	database.GormDB = db
+	database.gormDB = db
 	return database
 }
 
@@ -25,4 +29,8 @@ func New(options *database.Options) *MSSQLDB {
 	database := &MSSQLDB{}
 	database.options = options
 	return database
+}
+
+func (database *MSSQLDB) Foo() {
+
 }
