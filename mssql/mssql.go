@@ -31,6 +31,4 @@ func New(options *database.Options) *MSSQLDB {
 	return database
 }
 
-func (database *MSSQLDB) Foo() {
-
-}
+func (database *MSSQLDB) Foo() {}
