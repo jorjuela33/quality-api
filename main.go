@@ -1,8 +1,6 @@
 package main
 
 import (
-	"time"
-
 	_ "github.com/jinzhu/gorm/dialects/mssql"
 	"github.com/jorjuela33/quality-api/database"
 	"github.com/jorjuela33/quality-api/mssql"
@@ -11,8 +9,9 @@ import (
 )
 
 func main() {
-	router := server.NewRouter()
-	_server := server.NewServer()
+	_server := server.NewServer(&server.Options{
+		Port: ":8080",
+	})
 
 	// setup database connection
 	database := mssql.New(&database.Options{
@@ -26,12 +25,7 @@ func main() {
 		BasePath: resource.DefaultApiPath + "/products",
 		Database: database,
 	})
-	router.AddResources(productResource)
+	_server.AddResources(productResource)
 
-	// setup router
-	_server.UseRouter(router)
-
-	_server.Run(":8080", server.Options{
-		Timeout: 10 * time.Second,
-	})
+	_server.Run(":8080")
 }

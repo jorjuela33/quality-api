@@ -1,15 +1,15 @@
 package domain
 
-import "net/http"
+import "github.com/gin-gonic/gin"
 
 // RouteHandlerVersion type
 type RouteHandlerVersion string
 
 // Handler func
-type HandlerFunc func(http.ResponseWriter, *http.Request)
+type HandlerFunc gin.HandlerFunc
 
 // RouteHandlers is a map of route version to its handler
-type RouteHandlers map[RouteHandlerVersion]http.HandlerFunc
+type RouteHandlers map[RouteHandlerVersion]HandlerFunc
 
 type Route struct {
 	Name           string
@@ -17,7 +17,7 @@ type Route struct {
 	Pattern        string
 	DefaultVersion RouteHandlerVersion
 	RouteHandlers  RouteHandlers
-	Handler        HandlerFunc
+	Handler        gin.HandlerFunc // this should be replaced for this HandlerFunc but not working
 }
 
 // the routes type

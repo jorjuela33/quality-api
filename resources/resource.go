@@ -1,9 +1,9 @@
 package resource
 
 import (
-	"encoding/json"
 	"net/http"
 
+	"github.com/gin-gonic/gin"
 	"github.com/jorjuela33/quality-api/database"
 	"github.com/jorjuela33/quality-api/domain"
 	"github.com/jorjuela33/quality-api/models/product"
@@ -31,8 +31,11 @@ func NewResource(options *Options) *Resource {
 	return resource
 }
 
-func (resource *Resource) List(responseWriter http.ResponseWriter, request *http.Request) {
+func (resource *Resource) List(context *gin.Context) {
 	var products []model.Product
 	resource.Database.DB().Table("alm_insumos").Scan(&products)
-	json.NewEncoder(responseWriter).Encode(products)
+	context.JSON(http.StatusOK, gin.H{
+		"status":   "Fine",
+		"products": products,
+	})
 }

@@ -1,16 +1,17 @@
 package server
 
-import (
+/*import (
 	"errors"
 	"fmt"
 
+	"github.com/gin-gonic/gin"
 	"github.com/gorilla/mux"
 	"github.com/jorjuela33/quality-api/domain"
 	"github.com/jorjuela33/quality-api/resources"
 )
 
 type Router struct {
-	*mux.Router
+	*gin.Engine
 }
 
 func NewRouter() *Router {
@@ -46,4 +47,4 @@ func (router *Router) AddRoutes(routes *domain.Routes) *Router {
 	}
 
 	return router
-}
+}*/

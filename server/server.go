@@ -1,52 +1,78 @@
 package server
 
 import (
-	"net/http"
-	"time"
+	"errors"
+	"fmt"
 
-	"github.com/codegangsta/negroni"
-	"github.com/gorilla/context"
-	"gopkg.in/tylerb/graceful.v1"
+	"github.com/fvbock/endless"
+	"github.com/gin-gonic/gin"
+	"github.com/jorjuela33/quality-api/domain"
+	resource "github.com/jorjuela33/quality-api/resources"
 )
 
-// JSON body limit is set to 5MB
-const BodyLimitBytes uint32 = 1048576 * 5
-
 type Server struct {
-	negroni        *negroni.Negroni
-	router         *Router
-	gracefulServer *graceful.Server
-	timeout        time.Duration
+	router  *gin.Engine
+	options *Options
 }
 
 // Options for running the server
 type Options struct {
-	Timeout         time.Duration
-	ShutdownHandler func()
+	Port string
 }
 
-func NewServer() *Server {
-	negroni := negroni.Classic()
-	server := &Server{negroni, nil, nil, 0}
+func NewServer(options *Options) *Server {
+	router := gin.Default()
+	server := &Server{router, options}
 	return server
 }
 
-func (server *Server) Serve(responseWriter http.ResponseWriter, request *http.Request) *Server {
-	server.negroni.ServeHTTP(responseWriter, request)
+func (server *Server) AddResources(resources ...*resource.Resource) *Server {
+	for _, resource := range resources {
+		if resource.Routes == nil {
+			panic(errors.New(fmt.Sprintf("Routes definition missing: %v", resource)))
+		}
+
+		server.AddRoutes(resource.Routes)
+	}
+
+	return server
+}
+
+func (server *Server) AddRoutes(routes *domain.Routes) *Server {
+	if routes == nil {
+		return server
+	}
+
+	for _, route := range *routes {
+		_, ok := route.RouteHandlers[route.DefaultVersion]
+		if !ok {
+			errors := errors.New(fmt.Sprintf("Routes definition error, missing default route handler for version `%v` in `%v`", route.DefaultVersion, route.Name))
+			panic(errors)
+		}
+
+		switch route.Method {
+		case "GET":
+			server.router.GET(route.Pattern, route.Handler)
+
+		case "DELETE":
+			server.router.DELETE(route.Pattern, route.Handler)
+
+		case "POST":
+			server.router.POST(route.Pattern, route.Handler)
+
+		case "PUT":
+			server.router.PUT(route.Pattern, route.Handler)
+		}
+	}
+
 	return server
 }
 
 func (server *Server) Stop() {
-	server.gracefulServer.Stop(server.timeout)
+	endless.ListenAndServe(server.options.Port, server.router)
 }
 
-func (server *Server) Run(address string, options Options) *Server {
-	server.gracefulServer = &graceful.Server{Timeout: options.Timeout, Server: &http.Server{Addr: address, Handler: server.negroni}, ShutdownInitiated: options.ShutdownHandler}
-	server.gracefulServer.ListenAndServe()
-	return server
-}
-
-func (server *Server) UseRouter(router *Router) *Server {
-	server.negroni.UseHandler(context.ClearHandler(router))
+func (server *Server) Run(address string) *Server {
+	server.router.Run(server.options.Port)
 	return server
 }
