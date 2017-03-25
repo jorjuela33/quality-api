@@ -15,24 +15,40 @@ func New(renderType string) *Renderer {
 	return &Renderer{Type: renderType}
 }
 
-func (renderer *Renderer) Render(context *gin.Context, status int) {
+func (renderer *Renderer) Render(context *gin.Context, status int, v interface{}) {
 	switch renderer.Type {
 	case XML:
-		context.XML(status, gin.H{
-			"status": "Fine",
-			"foo":    "bar",
-		})
+		renderer.XML(context, status, v)
 
 	case Data:
-		/// TO BE DEFINED
+		renderer.Data(context, status, v.([]byte))
 
 	case Text:
-		context.String(status, "")
+		renderer.Text(context, status, v.([]byte))
 
 	default:
-		context.JSON(status, gin.H{
-			"status": "Fine",
-			"foo":    "bar",
-		})
+		renderer.JSON(context, status, v)
 	}
+}
+
+func (renderer *Renderer) Data(context *gin.Context, status int, v []byte) {
+	context.Data(status, "contentType", v)
+}
+
+func (renderer *Renderer) JSON(context *gin.Context, status int, v interface{}) {
+	context.JSON(status, gin.H{
+		"status": "Fine",
+		"foo":    v,
+	})
+}
+
+func (renderer *Renderer) Text(context *gin.Context, status int, v []byte) {
+	context.String(status, "")
+}
+
+func (renderer *Renderer) XML(context *gin.Context, status int, v interface{}) {
+	context.XML(status, gin.H{
+		"status": "Fine",
+		"foo":    v,
+	})
 }

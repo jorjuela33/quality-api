@@ -9,6 +9,13 @@ import (
 	"github.com/jorjuela33/quality-api/models/product"
 )
 
+type Products []model.Product
+
+type Response_v0 struct {
+	Products Products `json:"products"`
+	Success  bool     `json:"success"`
+}
+
 type ResourceInterface interface {
 	//Context() IContext
 	Routes() *domain.Routes
@@ -17,16 +24,17 @@ type ResourceInterface interface {
 type Resource struct {
 	Routes   *domain.Routes
 	Database database.DatabaseInterface
+	Renderer domain.RendererInterface
 }
 
 type Options struct {
 	BasePath string
 	Database database.DatabaseInterface
+	Renderer domain.RendererInterface
 }
 
 func NewResource(options *Options) *Resource {
-	database := options.Database
-	resource := &Resource{nil, database}
+	resource := &Resource{nil, options.Database, options.Renderer}
 	resource.createRoutes(options.BasePath)
 	return resource
 }
@@ -34,8 +42,5 @@ func NewResource(options *Options) *Resource {
 func (resource *Resource) List(context *gin.Context) {
 	var products []model.Product
 	resource.Database.DB().Table("alm_insumos").Scan(&products)
-	context.JSON(http.StatusOK, gin.H{
-		"status":   "Fine",
-		"products": products,
-	})
+	resource.Renderer.JSON(context, http.StatusOK, products)
 }
