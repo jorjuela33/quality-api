@@ -7,6 +7,7 @@ import (
 	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/jorjuela33/quality-api/domain"
+	"github.com/jorjuela33/quality-api/middlewares/authentication"
 	resource "github.com/jorjuela33/quality-api/resources"
 )
 
@@ -22,6 +23,7 @@ type Options struct {
 
 func NewServer(options *Options) *Server {
 	router := gin.Default()
+	router.Use(authentication.New())
 	server := &Server{router, options}
 	return server
 }
